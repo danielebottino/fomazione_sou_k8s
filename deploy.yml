@@ -1,7 +1,5 @@
 - name: Lab K8s Deploy
   hosts: k8lab
-  roles:
-    - sou_k8s
   tasks:
     - name: Software Installation
       tags: Softwares
