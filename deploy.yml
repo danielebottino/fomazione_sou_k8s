@@ -9,5 +9,43 @@
       loop:
         - podman
         - minikube
-        - jenkins
         - kubernetes-cli
+
+    - name: Installing pip packaging library
+      ansible.builtin.pip:
+        name: packaging
+        state: present
+
+    - name: Installing kubernetes dependencies
+      ansible.builtin.pip:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - kubernetes
+        - pyyaml
+        - jsonpatch
+
+    - name: Creating ad hoc volume for Jenkins
+      containers.podman.podman_volume:
+        name: jenkins-data
+        state: present
+
+    - name: Creating a K8s namespace
+      kubernetes.core.k8s:
+        name: "formazione-sou"
+        kind: "Namespace"
+        state: present
+
+    - name: Deploying Jenkins Container
+      containers.podman.podman_container:
+        name: jenkins-blueocean
+        image: docker.io/jenkinsci/blueocean
+        detach: true
+        privileged: true
+        publish:
+          - "50000:50000"
+          - "8080:8080"
+        volume:
+          - "jenkins-data:/var/jenkins_home"
+          - "jenkins-docker-certs:/certs/client:ro"
+        rm: false
