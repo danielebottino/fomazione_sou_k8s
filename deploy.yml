@@ -1,5 +1,7 @@
 - name: Lab K8s Deploy
   hosts: k8lab
+  vars:
+    mk_profile: minik8
   tasks:
     - name: Software Installation
       tags: Softwares
@@ -10,8 +12,8 @@
         - podman
         - minikube
         - kubernetes-cli
-
-    - name: Installing pip packaging library
+    
+    - name: Python Packaging Library
       ansible.builtin.pip:
         name: packaging
         state: present
@@ -24,6 +26,35 @@
         - kubernetes
         - pyyaml
         - jsonpatch
+
+    - name: Checking Podman Machine Existance
+      ansible.builtin.command: podman machine inspect --format string sou-machine
+      register: podmancheck
+      failed_when: false
+      changed_when: false
+    
+    - name: Creating Podman Machine if it doesn't exists
+      ansible.builtin.command: podman machine init sou-machine
+      when: podmancheck.rc != 0
+    - name: Starting Podman Machine
+      ansible.builtin.command: podman machine start sou-machine
+      when: podmancheck.rc != 0    
+        
+    
+    - name: Cheking if Minikube Profile Exists
+      ansible.builtin.command: minikube profile list -o json
+      register: mk_register
+      changed_when: false
+      failed_when: false
+
+    - name: Starting Minikube
+      ansible.builtin.command: >
+        minikube start
+        --driver=podman
+        --profile={{ mk_profile }}
+        --container-runtime=containerd
+      when: mk_profile not in mk_register.stdout
+        
 
     - name: Creating ad hoc volume for Jenkins
       containers.podman.podman_volume:
