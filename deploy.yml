@@ -1,7 +1,7 @@
 - name: Lab K8s Deploy
   hosts: k8lab
-  vars:
-    mk_profile: minik8
+  vars_files:
+    - Varploy.yml
   tasks:
     - name: Software Installation
       tags: Softwares
@@ -9,74 +9,55 @@
         name: "{{ item }}"
         state: present
       loop:
-        - podman
+        - docker
         - minikube
         - kubernetes-cli
-    
-    - name: Python Packaging Library
-      ansible.builtin.pip:
-        name: packaging
-        state: present
 
-    - name: Installing kubernetes dependencies
-      ansible.builtin.pip:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - kubernetes
-        - pyyaml
-        - jsonpatch
-
-    - name: Checking Podman Machine Existance
-      ansible.builtin.command: podman machine inspect --format string sou-machine
-      register: podmancheck
-      failed_when: false
-      changed_when: false
-    
-    - name: Creating Podman Machine if it doesn't exists
-      ansible.builtin.command: podman machine init sou-machine
-      when: podmancheck.rc != 0
-    - name: Starting Podman Machine
-      ansible.builtin.command: podman machine start sou-machine
-      when: podmancheck.rc != 0    
-        
-    
-    - name: Cheking if Minikube Profile Exists
-      ansible.builtin.command: minikube profile list -o json
-      register: mk_register
-      changed_when: false
-      failed_when: false
-
-    - name: Starting Minikube
-      ansible.builtin.command: >
-        minikube start
-        --driver=podman
-        --profile={{ mk_profile }}
-        --container-runtime=containerd
-      when: mk_profile not in mk_register.stdout
-        
-
-    - name: Creating ad hoc volume for Jenkins
-      containers.podman.podman_volume:
-        name: jenkins-data
-        state: present
-
-    - name: Creating a K8s namespace
-      kubernetes.core.k8s:
-        name: "formazione-sou"
-        kind: "Namespace"
+    - name: Creating K8s-Net
+      community.general.docker_network:
+        name: K8s-Net
+        ipam_config:
+          - subnet: 192.168.49.0/24
+            gateway: 192.168.49.1
+        driver: bridge
         state: present
 
     - name: Deploying Jenkins Container
-      containers.podman.podman_container:
-        name: jenkins-blueocean
-        image: docker.io/jenkinsci/blueocean
-        detach: true
-        privileged: true
-        publish:
-          - "50000:50000"
+      ansible.builtin.docker_container:
+        name: Jenkins-Container
+        image: jenkins/jenkins
+        ports:
           - "8080:8080"
-        volume:
-          - "jenkins-data:/var/jenkins_home"
-          - "jenkins-docker-certs:/certs/client:ro"
-        rm: false
+          - "50000:50000"
+        volumes:
+          - "jenkins_home:/var/jenkins_home"
+        networks:
+          - name: K8s-Net
+            ipv4_address: "{{ jenkins_ip }}"
+
+    - name: Checking if a Cluster already exists
+      ansible.builtin.command: minikube status
+      register: minikube_cluster_check
+      failed_when: false
+      changed_when: false
+    
+    - name: Starting a Minikube Cluster
+      ansible.builtin.command: minikube start --driver=docker --static-ip='"{{ control_ip }}"'
+      when: minikube_cluster_check.rc != 0
+
+    - name: Deploying Worker Nodes
+      tags: Worker
+      ansible.builtin.docker_container:
+        name: "{{ item.value.identification }}"
+        image: ubuntu
+        state: present
+        command: sleep infinity
+        networks:
+          - name: K8s-Net
+            ipv4_address: "{{ item.value.indirizzo }}"
+      loop: "{{ workers|dict2items }}"  
+
+      
+        
+        
+        

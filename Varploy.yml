@@ -1,0 +1,9 @@
+control_ip: 192.168.49.2
+jenkins_ip: 192.168.49.5
+workers:
+  k8s-worker1:
+    indirizzo: 192.168.49.3
+    identification: k8s-worker1
+  k8s-worker2:
+    indirizzo: 192.168.49.4
+    identification: k8s-worker2
