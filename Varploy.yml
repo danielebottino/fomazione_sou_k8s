@@ -1,4 +1,4 @@
-control_ip: 192.168.49.2
+
 jenkins_ip: 192.168.49.5
 workers:
   k8s-worker1:

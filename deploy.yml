@@ -42,7 +42,7 @@
       changed_when: false
     
     - name: Starting a Minikube Cluster
-      ansible.builtin.command: minikube start --driver=docker --static-ip='"{{ control_ip }}"'
+      ansible.builtin.command: minikube start --driver=docker
       when: minikube_cluster_check.rc != 0
 
     - name: Deploying Worker Nodes
