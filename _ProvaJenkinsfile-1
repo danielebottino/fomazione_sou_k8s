@@ -1,0 +1,12 @@
+pipeline {
+    environment{
+        BUILD_IMAGE: "danielebottino/flask-app-example-build"
+    }
+    stages {
+        stage('Set Tags') {
+            script {
+                def BUILD_TAG = 
+            }
+        }
+    }
+}
