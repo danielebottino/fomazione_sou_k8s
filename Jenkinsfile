@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker build -t ${IMAGE_NAME}:${BUILD_TAG} .
+                        docker buildx -t ${IMAGE_NAME}:${BUILD_TAG} .
                     """
                 }
             }
