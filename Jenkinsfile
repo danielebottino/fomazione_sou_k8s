@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         REGISTRY_URL = "https://index.docker.io/v1/"   // oppure "http://localhost:5000"
-        IMAGE_NAME   = "daniele/flask-app-example-app"     // cambia con il tuo DockerHub username
+        IMAGE_NAME   = "danielebottino/flask-app-example-app"     // cambia con il tuo DockerHub username
     }
 
     stages {    
@@ -17,7 +17,7 @@ pipeline {
                     if (env.GIT_TAG_NAME) {
                         // Build da tag Git
                         BUILD_TAG = env.GIT_TAG_NAME
-                    } else if (branch == "master" || branch == "main") {
+                    } else if (branch == "main") {
                         BUILD_TAG = "latest"
                     } else if (branch == "develop") {
                         BUILD_TAG = "develop-${sha}"
