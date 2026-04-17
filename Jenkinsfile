@@ -2,9 +2,15 @@ pipeline {
     agent any
 
     stages {
-        stage('Hello') {
+        stage('Build Docker Image') {
             steps {
-                echo "Ciao! Questa è la mia prima pipeline dichiarativa!"
+                sh "docker build -t daniele/flask-app ."
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh "docker push daniele/flask-app"
             }
         }
     }
