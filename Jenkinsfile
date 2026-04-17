@@ -1,61 +1,70 @@
 pipeline {
     agent any
 
-    args {
-        // Nome Immagine Docker
-        IMAGE_NAME = "daniele/flask-app-example-build"
-
-        // URL del Registry di Dockerhub o Locale http://127.0.0.1:5000/v2/...
-        REGISTRY_URL = "https://index.docker.io/v1/"
+    environment {
+        REGISTRY_URL = "https://index.docker.io/v1/"   // oppure "http://localhost:5000"
+        IMAGE_NAME   = "daniele/flask-app-example-app"     // cambia con il tuo DockerHub username
     }
 
-    stages {
+    stages {    
 
-        stage('Prepare Build TAG') {
+        stage('Prepare Build Tag') {
             steps {
                 script {
-                    // Determina il tag in base alla build
-                    if (args.GIT_TAG) {
-                        // Se parte da una tag di Git
-                        BUILD_TAG = args.GIT_TAG
-                    } else if (args.GIT_BRANCH == "origin/main") {
-                        // Se parte da un branch main
+                    def branch = env.GIT_BRANCH ?: sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                    def sha = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+
+                    if (env.GIT_TAG_NAME) {
+                        // Build da tag Git
+                        BUILD_TAG = env.GIT_TAG_NAME
+                    } else if (branch == "master" || branch == "main") {
                         BUILD_TAG = "latest"
-                    } else (args.GIT_BRANCH == "origin/develop") {
-                        // Per tutto il resto dei branch
-                        BUILD_TAG = "build-${args.GIT_COMMIT.take(7)}"
+                    } else if (branch == "develop") {
+                        BUILD_TAG = "develop-${sha}"
+                    } else {
+                        BUILD_TAG = "build-${sha}"
                     }
-                    echo "Build tag generato: ${BUILD_TAG}"
+
+                    echo "Docker tag generato: ${BUILD_TAG}"
                 }
             }
         }
 
-        stage('Build and Push Docker Image') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    def buildAndPushTag(Map args) {
-                        def defaults = [
-                            dockerfileDir: "./",
-                            dockerfileName: "Dockerfile",
-                            buildArgs: "",
-                            pushLatest: true
-                        ]
-                        args = defaults + args
-                        docker.withRegistry(args.REGISTRY_URL) {
-                            def image = docker.build(args.IMAGE_NAME, "${args.buidArgs} ${args.dockerfileDir} -f ${args.dockerfileName}")
-                            image.push(args.BUILD_TAG)
-                            if(args.pushLatest) {
-                                image.push("latest")
-                                sh "docker rmi --force ${args.IMAGE_NAME}:latest"
-                            }
-                            sh "docker rmi --force ${args.IMAGE_NAME}:${args.BUILD_TAG}"
-
-                            return "${args.IMAGE_NAME}:${args.BUILD_TAG}"
-                        }
-                    }
-
+                    sh """
+                        docker build -t ${IMAGE_NAME}:${BUILD_TAG} .
+                    """
                 }
             }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry(REGISTRY_URL, 'dockerhub-credentials') {
+                        sh "docker push ${IMAGE_NAME}:${BUILD_TAG}"
+                    }
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                script {
+                    sh "docker rmi ${IMAGE_NAME}:${BUILD_TAG} || true"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Build completata con successo: ${IMAGE_NAME}:${BUILD_TAG}"
+        }
+        failure {
+            echo "Build fallita"
         }
     }
 }
