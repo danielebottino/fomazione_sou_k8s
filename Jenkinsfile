@@ -16,13 +16,13 @@ pipeline {
 
                     if (env.TAG_NAME) {
                         // Build da tag Git
-                        BUILD_TAG = env.TAG_NAME
+                        def BUILD_TAG = env.TAG_NAME
                     } else if (branch == "main") {
-                        BUILD_TAG = "latest"
+                        def BUILD_TAG = "latest"
                     } else if (branch == "develop") {
-                        BUILD_TAG = "develop-${sha}"
+                        def BUILD_TAG = "develop-${sha}"
                     } else {
-                        BUILD_TAG = "build-${sha}"
+                        def BUILD_TAG = "build-${sha}"
                     }
 
                     echo "Docker tag generato: ${BUILD_TAG}"
