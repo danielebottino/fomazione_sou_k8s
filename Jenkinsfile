@@ -44,8 +44,9 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry(REGISTRY_URL, 'dockerhub-credentials') {
-                        def customImage = docker.build(${IMAGE_NAME}:${BUILD_TAG})
-                        customImage.push()
+                        sh """
+                        docker push ${IMAGE_NAME}:${BUILD_TAG}"
+                        """
                     }
                 }
             }
