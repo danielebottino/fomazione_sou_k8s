@@ -1,4 +1,5 @@
 pipeline {
+
     agent any
 
     environment {
@@ -33,6 +34,7 @@ pipeline {
                                   usernameVariable: 'DOCKER_USER',
                                   passwordVariable: 'DOCKER_TOKEN')]) {
                                 sh """
+                                    docker build -t danielebottino/flask-app-example-build .
                                     docker logout || true
 
                                      echo "\$DOCKER_TOKEN" | docker login https://hubproxy.docker.internal:5555 \
