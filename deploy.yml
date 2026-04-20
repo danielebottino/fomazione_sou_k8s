@@ -2,7 +2,7 @@
 - name: Lab K8s Deploy
   hosts: k8lab
   vars_files:
-    - Varploy.yml
+    - NodeVars.yml
   tasks:
     - name: Software Installation
       tags: Softwares
