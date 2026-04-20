@@ -32,11 +32,9 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                def customImage = docker.build("${IMAGE_NAME}:${BUILD_TAG}")
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials',
                                   usernameVariable: 'DOCKER_USER',
                                   passwordVariable: 'DOCKER_TOKEN')]) {
-
                                 sh """
                                     docker logout || true
 
@@ -46,7 +44,9 @@ pipeline {
                                     echo "\$DOCKER_TOKEN" | docker login https://index.docker.io/v2/ \
                                     --username "\$DOCKER_USER" --password-stdin
                                 """
-                                customImage.push()
+                                    } script {
+                                         def customImage = docker.build("${IMAGE_NAME}:${BUILD_TAG}")
+                                         customImage.push()
                                     }
             }
         }
