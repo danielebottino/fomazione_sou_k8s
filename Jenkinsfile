@@ -5,7 +5,6 @@ pipeline {
     environment {
         REGISTRY_URL = "https://index.docker.io/v2/"
         IMAGE_NAME   = "danielebottino/flask-app-example-build"     // cambia con il tuo DockerHub username
-        BUILD_TAG = ''
     }
 
     stages {    
@@ -13,15 +12,21 @@ pipeline {
         stage('Prepare Build Tag') {
             steps {
                 script {
+
+                    def BUILD_TAG = ''
+
                     if (env.TAG_NAME) {
-                        env.BUILD_TAG = env.TAG_NAME
+                        BUILD_TAG = env.TAG_NAME
                     } else if (env.BRANCH_NAME == 'main') {
-                        env.BUILD_TAG = 'latest'
+                        BUILD_TAG = 'latest'
                     } else if (env.BRANCH_NAME == 'develop') {
-                        env.BUILD_TAG = "develop-${env.GIT_COMMIT?.take(7)}"
+                        BUILD_TAG = "develop-${env.GIT_COMMIT?.take(7)}"
                     } else {
-                        env.BUILD_TAG = "build-${env.GIT_COMMIT?.take(7)}"
+                        BUILD_TAG = "build-${env.GIT_COMMIT?.take(7)}"
                     }
+
+                    env.BUILD_TAG = BUILD_TAG
+                    
                 }
             }
         }
