@@ -39,6 +39,15 @@ pipeline {
                 }
             }
         }
+        stage('Logout from Docker') {
+            steps {
+                script {
+                    sh """
+                        docker logout || true
+                    """    
+                }
+            }
+        }
 
         stage('Push Docker Image') {
             steps {
