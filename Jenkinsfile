@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         REGISTRY_URL = "https://index.docker.io/v2/"
-        IMAGE_NAME   = "danielebottino/flask-app-example-app"     // cambia con il tuo DockerHub username
+        IMAGE_NAME   = "danielebottino/flask-app-example-build"     // cambia con il tuo DockerHub username
     }
 
     stages {    
