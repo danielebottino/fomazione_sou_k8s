@@ -46,9 +46,8 @@ pipeline {
                                     echo "\$DOCKER_TOKEN" | docker login https://index.docker.io/v2/ \
                                     --username "\$DOCKER_USER" --password-stdin
                                 """
+                                customImage.push()
                                     }
-                customImage.push()
-
             }
         }
         stage('Logout from Docker') {
