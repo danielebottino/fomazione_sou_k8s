@@ -48,6 +48,7 @@ pipeline {
                                     def customImage = docker.build("${IMAGE_NAME}:${BUILD_TAG}")
                                     customImage.push()
                                     }
+                }
             }
         }
         stage('Logout from Docker') {
