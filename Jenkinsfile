@@ -11,18 +11,15 @@ pipeline {
         stage('Prepare Build Tag') {
             steps {
                 script {
-                    def branch = env.GIT_BRANCH ?: sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
-                    def sha = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-
                     if (env.TAG_NAME) {
                         // Build da tag Git
                         def BUILD_TAG = env.TAG_NAME
-                    } else if (branch == "main") {
+                    } else if (BRANCH_NAME == "main") {
                         def BUILD_TAG = "latest"
-                    } else if (branch == "develop") {
-                        def BUILD_TAG = "develop-${sha}"
+                    } else if (BRANCH_NAME == "develop") {
+                        def BUILD_TAG = "develop-${shacommit}"
                     } else {
-                        def BUILD_TAG = "build-${sha}"
+                        def BUILD_TAG = "build-${shacommit}"
                     }
 
                     echo "Docker tag generato: ${BUILD_TAG}"
@@ -54,7 +51,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Cleanup') {
             steps {
                 script {
