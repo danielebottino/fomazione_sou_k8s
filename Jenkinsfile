@@ -15,9 +15,9 @@ pipeline {
                     if (env.TAG_NAME) {
                         // Build da tag Git
                         def BUILD_TAG = env.TAG_NAME
-                    } else if (BRANCH_NAME == "main") {
+                    } else if (env.BRANCH_NAME == "main") {
                         def BUILD_TAG = "latest"
-                    } else if (BRANCH_NAME == "develop") {
+                    } else if (env.BRANCH_NAME == "develop") {
                         def BUILD_TAG = "develop-${env.GIT_COMMIT}"
                     } else {
                         def BUILD_TAG = "build-${env.GIT_COMMIT}"
@@ -39,14 +39,6 @@ pipeline {
                                     docker push ${IMAGE_NAME}:${BUILD_TAG}
                                 """
                                     }
-                }
-            }
-        }
-
-        stage('Cleanup') {
-            steps {
-                script {
-                    sh "docker rmi ${IMAGE_NAME}:${BUILD_TAG} || true"
                 }
             }
         }
