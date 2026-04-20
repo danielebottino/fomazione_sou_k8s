@@ -27,7 +27,7 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Docker Image & Push') {
             steps {
                 script {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials',
@@ -35,18 +35,8 @@ pipeline {
                                   passwordVariable: 'DOCKER_TOKEN')]) {
                                 sh """
                                     docker build -t danielebottino/flask-app-example-build .
-                                    docker logout || true
-
-                                     echo "\$DOCKER_TOKEN" | docker login https://hubproxy.docker.internal:5555 \
-                                    --username "\$DOCKER_USER" --password-stdin
-
-                                    echo "\$DOCKER_TOKEN" | docker login https://index.docker.io/v2/ \
-                                    --username "\$DOCKER_USER" --password-stdin
-
-                                    echo "\$DOCKER_TOKEN" | docker login https://registry-1.docker.io/v2/ \
-                                    --username "\$DOCKER_USER" --password-stdin
-
-                                    docker push ${IMAGE_NAME}:latest
+                                    echo \$DOCKER_TOKEN | docker login -u \$DOCKER_USER --password-stdin
+                                    docker push ${IMAGE_NAME}:${BUILD_TAG}
                                 """
                                     }
                 }
