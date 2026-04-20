@@ -14,9 +14,9 @@ pipeline {
                     def branch = env.GIT_BRANCH ?: sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
                     def sha = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
 
-                    if (env.GIT_TAG_NAME) {
+                    if (env.TAG_NAME) {
                         // Build da tag Git
-                        BUILD_TAG = env.GIT_TAG_NAME
+                        BUILD_TAG = env.TAG_NAME
                     } else if (branch == "main") {
                         BUILD_TAG = "latest"
                     } else if (branch == "develop") {
