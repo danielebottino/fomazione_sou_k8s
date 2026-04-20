@@ -17,9 +17,9 @@ pipeline {
                     } else if (BRANCH_NAME == "main") {
                         def BUILD_TAG = "latest"
                     } else if (BRANCH_NAME == "develop") {
-                        def BUILD_TAG = "develop-${shacommit}"
+                        def BUILD_TAG = "develop-${env.GIT_COMMIT}"
                     } else {
-                        def BUILD_TAG = "build-${shacommit}"
+                        def BUILD_TAG = "build-${env.GIT_COMMIT}"
                     }
 
                     echo "Docker tag generato: ${BUILD_TAG}"
