@@ -44,6 +44,9 @@ pipeline {
 
                                     echo "\$DOCKER_TOKEN" | docker login https://index.docker.io/v2/ \
                                     --username "\$DOCKER_USER" --password-stdin
+
+                                    echo "\$DOCKER_TOKEN" | docker login https://registry-1.docker.io/v2/ \
+                                    --username "\$DOCKER_USER" --password-stdin
                                 """
                                     def customImage = docker.build("${IMAGE_NAME}:${BUILD_TAG}")
                                     customImage.push()
