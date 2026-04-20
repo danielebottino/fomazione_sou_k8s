@@ -45,8 +45,7 @@ pipeline {
                 script {
                     docker.withRegistry(REGISTRY_URL, 'dockerhub-credentials') {
                         sh """
-                        docker push ${IMAGE_NAME}:${BUILD_TAG}"
-                        """
+                        docker push ${IMAGE_NAME}:${BUILD_TAG}"""
                     }
                 }
             }
