@@ -26,12 +26,13 @@
     - name: Deploying Jenkins Container
       ansible.builtin.docker_container:
         name: Jenkins-Container
-        image: danielebottino/dockins
+        image: jenkins/jenkins:2.555.1-lts
         ports:
           - "8080:8080"
           - "50000:50000"
         volumes:
           - "jenkins_home:/var/jenkins_home"
+          - "/var/run/docker.sock:/var/run/docker.sock"
         networks:
           - name: K8s-Net
             ipv4_address: "{{ jenkins_ip }}"
