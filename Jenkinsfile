@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        REGISTRY_URL = "http://localhost:3000"
+        REGISTRY_URL = "https://index.docker.io/v1/"
         IMAGE_NAME   = "danielebottino/flask-app-example-app"     // cambia con il tuo DockerHub username
     }
 
