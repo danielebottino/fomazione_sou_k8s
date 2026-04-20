@@ -47,34 +47,14 @@ pipeline {
 
                                     echo "\$DOCKER_TOKEN" | docker login https://registry-1.docker.io/v2/ \
                                     --username "\$DOCKER_USER" --password-stdin
+
+                                    docker push ${IMAGE_NAME}:${BUILD_TAG}
                                 """
-                                    def customImage = docker.build("${IMAGE_NAME}:${BUILD_TAG}")
-                                    customImage.push()
                                     }
                 }
             }
         }
-        stage('Logout from Docker') {
-            steps {
-                script {
-                    sh """
-                        docker logout || true
-                    """    
-                }
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry(REGISTRY_URL, 'dockerhub-credentials') {
-                        sh """
-                        docker push ${IMAGE_NAME}:${BUILD_TAG}"""
-                    }
-                }
-            }
-        }
-
+        
         stage('Cleanup') {
             steps {
                 script {
