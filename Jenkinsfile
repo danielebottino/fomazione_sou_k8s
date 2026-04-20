@@ -21,7 +21,6 @@ pipeline {
                     } else {
                         def BUILD_TAG = "build-${env.GIT_COMMIT}"
                     }
-
                     echo "Docker tag generato: ${BUILD_TAG}"
                 }
             }
@@ -45,7 +44,7 @@ pipeline {
                                     echo "\$DOCKER_TOKEN" | docker login https://registry-1.docker.io/v2/ \
                                     --username "\$DOCKER_USER" --password-stdin
 
-                                    docker push ${IMAGE_NAME}:${BUILD_TAG}
+                                    docker push ${IMAGE_NAME}:latest
                                 """
                                     }
                 }
