@@ -34,7 +34,7 @@ pipeline {
                                   usernameVariable: 'DOCKER_USER',
                                   passwordVariable: 'DOCKER_TOKEN')]) {
                                 sh """
-                                    docker build -t danielebottino/flask-app-example-build .
+                                    docker build -t danielebottino/flask-app-example-build:${BUILD_TAG} .
                                     echo \$DOCKER_TOKEN | docker login -u \$DOCKER_USER --password-stdin
                                     docker push ${IMAGE_NAME}:${BUILD_TAG}
                                 """
