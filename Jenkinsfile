@@ -51,7 +51,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImg = docker.build("${APP_NAME}:${env.DOCKER_TAG}")
+                    dockerImg = docker.build("${APP_NAME}:${env.DOCKER_TAG}", "-f Dockerfile ./app")
                     echo "Immagine '${APP_NAME}:${env.DOCKER_TAG}' buildata con successo."
                 }
             }
