@@ -37,7 +37,7 @@ pipeline {
                         echo "Sorgente: Branch develop. Docker Tag: '${env.DOCKER_TAG}'"
                     } 
                     else {
-                        env.DOCKER_TAG = `${env.BRANCH_NAME}-${env.GIT_COMMIT_SHORT}`
+                        env.DOCKER_TAG = "${env.BRANCH_NAME}-${env.GIT_COMMIT_SHORT}"
                         echo "Sorgente: Branch '${env.BRANCH_NAME}'. Docker Tag: '${env.DOCKER_TAG}'"
                     }
                     echo "Variabili rilevate:"
