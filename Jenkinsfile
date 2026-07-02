@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo ${env.BUILD_TAG}
+                echo "${env.BUILD_TAG}"
             }
         }
     }
